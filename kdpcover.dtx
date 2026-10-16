@@ -31,7 +31,7 @@
 %<class>\NeedsTeXFormat{LaTeX2e}
 %<class>\ProvidesClass{kdpcover}
 %<*class>
-[0000-00-00 0.0.0 Cover for Kindle Direct Publishing books]
+[2026-10-16 0.7.1 Cover for Kindle Direct Publishing books]
 %</class>
 %<*driver>
 \documentclass{ltxdoc}
@@ -57,7 +57,7 @@
 %</driver>
 % \fi
 
-% \title{\includegraphics[width=0.75in]{yb-book-logo.pdf} \\ |kdpcover|: \LaTeX{} Package \\ for Amazon Book Covers\thanks{The sources are on GitHub at \href{https://github.com/yegor256/kdpcover}{yegor256/kdpcover}}}
+% \title{\includegraphics[width=0.75in]{yb-book-logo.pdf} \\ |kdpcover|: \LaTeX{} Class \\ for Amazon Book Covers\thanks{The sources are on GitHub at \href{https://github.com/yegor256/kdpcover}{yegor256/kdpcover}}}
 % \author{Yegor Bugayenko \\ \texttt{yegor256@gmail.com}}
 % \date{\filedate, \fileversion}
 %
@@ -70,13 +70,12 @@
 % This class produces a book cover suitable for Kindle Direct Publishing (KDP).
 % The author employs it for \href{https://amzn.to/2WMTXWF}{a number of his books}.
 % A \LaTeX{} document conforming to this class takes the following form:
-% \docshotPrerequisite{cactus.pdf}
-% \begin{docshot}
+% \begin{docshot}[prerequisite=cactus.pdf]
 % \documentclass[pages=200,6x9]{kdpcover}
 % \begin{document}
 % \putSpine{kdpcover, a LaTeX class for KDP books}
 % \putVolume{1}
-% \putVersion{0.0.0}
+% \putVersion{0.7.1}
 % \putPrice{\$0.00}
 % \putCopyright{\the\year}{Yegor Bugayenko}
 % \putTitle{kdpcover}
@@ -146,6 +145,13 @@
 %\fi
 % \end{macro}
 
+% \begin{macro}{7x10}
+% \begin{macro}{8x10}
+% The |7x10| and |8x10| options set the page dimensions to 7x10 and 8x10
+% inches respectively; |6x9| is the default.
+% \end{macro}
+% \end{macro}
+
 % \begin{macro}{barless}
 % To eliminate the black bar at the centre of the page, the |barless|
 % option suffices:
@@ -166,8 +172,9 @@
 
 % \begin{macro}{\putSpine}
 % The |\putSpine| command places a vertical black spine line containing two
-% white elements: the text at the top and the logo at the bottom. The text
-% should be sufficiently short to avoid contact with the logo. It is sound
+% white elements: the text at the top and the logo at the bottom. The optional
+% argument names the file with the logo, |kdpcover-signature| by default. The
+% text should be sufficiently short to avoid contact with the logo. It is sound
 % practice to record the volume number at the end of the text whenever more
 % than one volume exists, e.g.\ ``my book, vol.\ 1''. The use of small caps
 % within the text alone is recommended.
@@ -175,7 +182,8 @@
 
 % \begin{macro}{\putVolume}
 % This command renders the volume figure. It is deliberately rendered at large
-% size to ensure conspicuousness.
+% size to ensure conspicuousness. Only volumes from 1 to 4 are supported, since
+% the class ships the figures as |kdpcover-vol-1.pdf| through |kdpcover-vol-4.pdf|.
 % \end{macro}
 
 % \begin{macro}{\putVersion}
@@ -256,7 +264,7 @@
   pdf/.code = {
     \IfFileExists{#1}
       {}
-      {\PackageError{kdpcover}{The "#1" file is absent}{}}%
+      {\ClassError{kdpcover}{The "#1" file is absent}{}}%
     \iexec[trace,quiet,stdout=kdpcover-pages-count.txt]
       {qpdf --show-npages --no-warn #1 | tr -d '[[:space:]]'}
     \openin1=kdpcover-pages-count.txt
@@ -300,11 +308,11 @@
   \setstretch{1.2}
 %    \end{macrocode}
 
-% Then, we calculate size.
-% The height of the page is 9 inches plus 0.125 "bleed" on top and
+% Then, we declare the lengths of the page.
+% The height is |\kdpysize| plus 0.125 inches of ``bleed'' on top and
 % on the bottom, see \href{https://kdp.amazon.com/en_US/help/topic/G201953020}{this}.
-% The width is 6 inches plus 0.125 "bleed" on each side. The width of the
-% "spine" depends on the amount of pages in the book.
+% The width is twice |\kdpxsize| plus 0.125 inches of ``bleed'' on each side,
+% plus the ``spine,'' whose width depends on the number of pages in the book.
 %    \begin{macrocode}
 \makeatletter
 \newlength\kdp@height
@@ -312,7 +320,10 @@
 \makeatother
 %    \end{macrocode}
 
-% Then, we set the size of the page, using |geometry|:
+% Then, right before the document begins, we calculate the lengths, set
+% the size of the page, using |geometry|, and split the page into a 16 by 16
+% grid of |textpos|, which must happen after the size is known:
+% \changes{v0.6.2}{2026/10/16}{The \texttt{textpos} grid is computed from the cover size instead of the letter paper.}
 %    \begin{macrocode}
 \RequirePackage{geometry}
 \makeatletter
@@ -330,15 +341,15 @@
     top=0pt,
     bottom=0pt
   }%
+  \TPGrid{16}{16}%
 }
 \makeatother
 %    \end{macrocode}
 
-% Then, we set coordinates using |textpos|:
+% Then, we load |textpos| with absolute coordinates:
 %    \begin{macrocode}
 \PassOptionsToPackage{absolute}{textpos}
 \RequirePackage{textpos}
-\TPGrid{16}{16}
 %    \end{macrocode}
 
 % \begin{macro}{\putSpine}
@@ -450,16 +461,25 @@
 % \end{macro}
 
 % \begin{macro}{\putVersion}
-% Then, we define |\putVersion|:
+% Then, we define |\putVersion|. The date is printed when the current
+% directory is a Git repository, which means that |.git| is either a
+% directory with |HEAD| inside or, in a worktree or a submodule, a plain
+% file. Since kpathsea refuses to open directories, |.git| is checked twice:
+% \changes{v0.6.2}{2026/10/16}{The Git date is printed when \texttt{.git} is a directory, not only when it is a file.}
 %    \begin{macrocode}
+\makeatletter
+\newcommand\kdp@gitdate{%
+  \quad\iexec{git log -n 1 --pretty='format:\%ad' --date='format:\%e-\%b-\%Y'}%
+}
 \newcommand\putVersion[1]{%
   \begin{textblock}{4}[0,1](10,14)%
     #1%
-    \IfFileExists{.git}
-      {\quad\iexec{git log -n 1 --pretty='format:\%ad' --date='format:\%e-\%b-\%Y'}}
-      {}%
+    \IfFileExists{.git/HEAD}
+      {\kdp@gitdate}
+      {\IfFileExists{.git}{\kdp@gitdate}{}}%
   \end{textblock}%
 }
+\makeatother
 %    \end{macrocode}
 % \end{macro}
 
