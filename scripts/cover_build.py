@@ -114,6 +114,7 @@ def reserve_artifacts(root, destination):
     artifacts = {}
     try:
         for name, path in [('output', destination), ('log', destination.with_suffix('.build.log')), ('record', destination.with_suffix('.build.json'))]:
+            if os.path.lexists(path): raise ValueError('Existing companion preserved.')
             path = private_path(root, path)
             fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
             artifacts[name] = (path, fd, os.fstat(fd))
@@ -148,6 +149,7 @@ def build(root, source, destination):
     root = outside_git(root)
     root.mkdir(parents=True, exist_ok=True, mode=0o700)
     source = private_path(root, source)
+    if os.path.lexists(destination): raise ValueError('Existing output preserved; choose a new versioned output path.')
     destination = private_path(root, destination)
     if destination.exists(): raise ValueError('Existing output preserved; choose a new versioned output path.')
     validated, expected_pages = prepare_source(source, root)

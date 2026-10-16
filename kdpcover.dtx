@@ -331,6 +331,7 @@
 \newbox\kdp@linebox
 \newbox\kdp@naturalbox
 \newif\ifkdp@overflow
+\newif\ifkdp@scan
 \newlength\kdp@fitfont
 \newcommand\kdpfitblock[6]{%
   \begingroup
@@ -344,12 +345,21 @@
     \global\kdp@overflowfalse
     \setbox\kdp@scanbox=\vbox{%
       \unvcopy\kdp@fitbox
-      \loop\unskip\unpenalty
-      \ifnum\lastnodetype=1
-        \setbox\kdp@linebox=\lastbox
-        \setbox\kdp@naturalbox=\hbox{\unhcopy\kdp@linebox}%
-        \ifdim\wd\kdp@naturalbox>#2\relax\global\kdp@overflowtrue\fi
-      \repeat}%
+      \kdp@scantrue
+      \loop
+        \ifnum\lastnodetype=1
+          \setbox\kdp@linebox=\lastbox
+          \setbox\kdp@naturalbox=\hbox{\unhcopy\kdp@linebox}%
+          \ifdim\wd\kdp@naturalbox>#2\relax\global\kdp@overflowtrue\fi
+        \else\ifnum\lastnodetype=11 \unskip
+        \else\ifnum\lastnodetype=12 \unkern
+        \else\ifnum\lastnodetype=13 \unpenalty
+        \else
+          % Empty list ends the scan. Unsupported vertical material fails closed.
+          \ifnum\lastnodetype>-1 \global\kdp@overflowtrue\fi
+          \kdp@scanfalse
+        \fi\fi\fi\fi
+      \ifkdp@scan\repeat}%
     \ifdim\dimexpr\ht\kdp@fitbox+\dp\kdp@fitbox\relax>#3\relax
       \global\kdp@overflowtrue
     \fi

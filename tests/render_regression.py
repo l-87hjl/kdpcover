@@ -97,6 +97,12 @@ def main():
         (output/(name+'.tex')).write_text(r'\documentclass[pages=200,6x9]{kdpcover}\begin{document}'+chr(92)+helper+'{'+'N'*120+r'}\end{document}')
         commands.append(run(output,'pdflatex',name+'.tex',False))
         assert 'does not fit its safe layout box' in (output/(name+'-pdflatex.console.log')).read_text()
+    for helper in ['putTitle','putAuthor','putTLDR','putBack']:
+        for label, separator in [('paragraph',r'\par '),('line',r'\\[2pt] ')]:
+            name='wide-'+helper+'-'+label
+            (output/(name+'.tex')).write_text(r'\documentclass[pages=200,6x9]{kdpcover}\begin{document}'+chr(92)+helper+'{'+'N'*120+separator+r'Short final line}\end{document}')
+            commands.append(run(output,'pdflatex',name+'.tex',False))
+            assert 'does not fit its safe layout box' in (output/(name+'-pdflatex.console.log')).read_text()
     (output/'wide-original-title.tex').write_text(tex('pages=200,6x9','N'*52))
     commands.append(run(output,'pdflatex','wide-original-title.tex',False))
     (output/'fit-unbroken.tex').write_text(tex('pages=200,6x9','N'*30))

@@ -71,4 +71,13 @@ class CoverBuildGuardTests(unittest.TestCase):
             with self.assertRaises(ValueError):guard.reserve_artifacts(folder,destination)
             self.assertEqual(sentinel.read_text(),'SYNTHETIC SENTINEL');self.assertFalse(destination.exists())
 
+    def test_dangling_in_root_companion_is_not_followed(self):
+        for suffix in ['.build.log','.build.json']:
+            folder=self.root/('dangling-'+suffix.rsplit('.',1)[1]);folder.mkdir()
+            target=folder/'absent';destination=folder/'cover.pdf'
+            destination.with_suffix(suffix).symlink_to(target)
+            with self.assertRaises(ValueError):guard.reserve_artifacts(folder,destination)
+            self.assertFalse(target.exists());self.assertFalse(destination.exists())
+            self.assertTrue(destination.with_suffix(suffix).is_symlink())
+
 if __name__=='__main__':unittest.main()
