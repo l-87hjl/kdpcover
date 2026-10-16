@@ -112,3 +112,20 @@ it installs no rendering toolchain and uploads no book/artifact. Local rendered 
 still required before a candidate pin. CI runs after publication and cannot undo an
 accidental disclosure, so explicit staging/pre-push review remain essential. Existing
 upstream-owned deployment jobs are not activated for maintained-fork builds.
+
+
+## Reviewed repair controls
+
+The guarded source must begin with one literal `kdpcover` documentclass and exactly
+one active `pages=` or `pdf=` option. Comments cannot supply options; duplicate,
+mixed, macro-based or pre-supplied options are rejected. The class reports its actual
+page count and the guard verifies it before retaining the output. This trusted-source
+subset deliberately rejects unsupported TeX indirection rather than guessing.
+
+Graphics must resolve to one existing PDF/PNG/JPEG file within private storage and
+outside Git. Extensionless references are supported only when unambiguous. The checked
+private copy uses canonical explicit filenames; source-directory searches cannot select
+a different image. Output/sidecars use exclusive no-follow creation and held descriptors.
+Text fitting checks both typeset line widths and block height at the chosen font size;
+content that cannot fit at the minimum becomes a class error, including direct use.
+Historical candidate tags are unchanged; repairs are identified by new exact commits.

@@ -327,23 +327,41 @@
 %    \begin{macrocode}
 \makeatletter
 \newsavebox{\kdp@fitbox}
+\newbox\kdp@scanbox
+\newbox\kdp@linebox
+\newbox\kdp@naturalbox
+\newif\ifkdp@overflow
 \newlength\kdp@fitfont
 \newcommand\kdpfitblock[6]{%
   \begingroup
   \setlength\kdp@fitfont{#4}%
   \loop
-    \sbox{\kdp@fitbox}{\parbox[t]{#2}{%
-      \raggedright\setstretch{1}%
-      \fontsize{\kdp@fitfont}{1.1\kdp@fitfont}\selectfont #1\par}}%
-    \kdp@retryfalse
+    % Keep the real typeset lines for output; inspect their natural widths too.
+    \setbox\kdp@fitbox=\vtop{%
+      \hsize=#2\relax\@parboxrestore\raggedright\setstretch{1}%
+      \hfuzz=\maxdimen
+      \fontsize{\kdp@fitfont}{1.1\kdp@fitfont}\selectfont #1\par}%
+    \global\kdp@overflowfalse
+    \setbox\kdp@scanbox=\vbox{%
+      \unvcopy\kdp@fitbox
+      \loop\unskip\unpenalty
+      \ifnum\lastnodetype=1
+        \setbox\kdp@linebox=\lastbox
+        \setbox\kdp@naturalbox=\hbox{\unhcopy\kdp@linebox}%
+        \ifdim\wd\kdp@naturalbox>#2\relax\global\kdp@overflowtrue\fi
+      \repeat}%
     \ifdim\dimexpr\ht\kdp@fitbox+\dp\kdp@fitbox\relax>#3\relax
+      \global\kdp@overflowtrue
+    \fi
+    \kdp@retryfalse
+    \ifkdp@overflow
       \ifdim\kdp@fitfont>#5\relax
         \addtolength\kdp@fitfont{-1pt}\kdp@retrytrue
       \fi
     \fi
     \ifkdp@retry
   \repeat
-  \ifdim\dimexpr\ht\kdp@fitbox+\dp\kdp@fitbox\relax>#3\relax
+  \ifkdp@overflow
     \ClassError{kdpcover}{#6 does not fit its safe layout box}{Shorten the text or provide a custom layout.}%
   \else\usebox{\kdp@fitbox}\fi
   \endgroup
@@ -385,6 +403,7 @@
   \else
     \ifnum\kdp@pages>828\ClassError{kdpcover}{White stock exceeds 828 pages}{}\fi
   \fi
+  \typeout{KDP-COVER-PAGES=\the\kdp@pages}%
   \kdp@calcspine%
   \setlength\kdp@height{0.125in + \kdpysize + 0.125in}%
   \setlength\kdp@width{

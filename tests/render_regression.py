@@ -91,6 +91,19 @@ def main():
     commands.append(run(output,'pdflatex','oversized-title.tex',False))
     for name,opts in [('zero','pages=0'),('negative','pages=-1'),('fraction','pages=20.5'),('cream-over-limit','pages=777,paper=cream'),('white-over-limit','pages=829,paper=white'),('unknown-stock','pages=200,paper=unknown')]:
         (output/(name+'.tex')).write_text(tex(opts));commands.append(run(output,'pdflatex',name+'.tex',False))
+    # Every direct-class text helper must reject an unbreakable token at its minimum.
+    for helper in ['putTitle','putAuthor','putTLDR','putBack']:
+        name='wide-'+helper
+        (output/(name+'.tex')).write_text(r'\documentclass[pages=200,6x9]{kdpcover}\begin{document}'+chr(92)+helper+'{'+'N'*120+r'}\end{document}')
+        commands.append(run(output,'pdflatex',name+'.tex',False))
+        assert 'does not fit its safe layout box' in (output/(name+'-pdflatex.console.log')).read_text()
+    (output/'wide-original-title.tex').write_text(tex('pages=200,6x9','N'*52))
+    commands.append(run(output,'pdflatex','wide-original-title.tex',False))
+    (output/'fit-unbroken.tex').write_text(tex('pages=200,6x9','N'*30))
+    commands.append(run(output,'pdflatex','fit-unbroken.tex'))
+    results['fit-unbroken']=measure(output/'fit-unbroken.pdf',12.75,True)
+    fitted=fitz.open(output/'fit-unbroken.pdf')
+    assert 'N'*30 in fitted[0].get_text(),'fitted unbreakable title lost text'
     # Synthetic 200-page interior proves shell-free page counting on installed engines.
     doc=fitz.open()
     for _ in range(200):doc.new_page(width=432,height=648)
@@ -104,6 +117,16 @@ def main():
     p=subprocess.run(['python3',str(REPO/'scripts/cover_build.py'),'--private-root',str(output),'--source',str(output/'guarded.tex'),'--output',str(output/'guarded.pdf')],text=True,capture_output=True)
     (output/'guarded.console.log').write_text(p.stdout+p.stderr);assert p.returncode==0,'guarded cover build failed'
     results['guarded']=measure(output/'guarded.pdf',12.7004,True)
+    # Extensionless graphics compile from the canonical checked resource.
+    (output/'extensionless.tex').write_text(tex('pages=200,paper=cream,6x9').replace('synthetic-art.pdf','synthetic-art'))
+    p=subprocess.run(['python3',str(REPO/'scripts/cover_build.py'),'--private-root',str(output),'--source',str(output/'extensionless.tex'),'--output',str(output/'extensionless.pdf')],text=True,capture_output=True)
+    assert p.returncode==0,'safe extensionless resource failed'
+    results['extensionless']=measure(output/'extensionless.pdf',12.75,True)
+    assert json.loads((output/'extensionless.build.json').read_text())['effective_pages']==200
+    # A source that changes the effective count after validation fails closed.
+    (output/'changed-count.tex').write_text(tex('pages=200,6x9').replace(r'\begin{document}',r'\makeatletter\kdp@pages=10\makeatother\begin{document}'))
+    p=subprocess.run(['python3',str(REPO/'scripts/cover_build.py'),'--private-root',str(output),'--source',str(output/'changed-count.tex'),'--output',str(output/'changed-count.pdf')],text=True,capture_output=True)
+    assert p.returncode!=0 and not (output/'changed-count.pdf').exists(),'effective count mismatch passed'
     (output/'render-regression.json').write_text(json.dumps({'results':results,'commands':commands},indent=2)+'\n')
     print(json.dumps({k:{kk:vv for kk,vv in v.items() if kk!='fonts'} for k,v in results.items()},indent=2));print('Synthetic cover rendered regression passed.')
 
