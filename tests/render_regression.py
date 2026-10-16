@@ -41,6 +41,9 @@ def measure(pdf,expected_width,spine_expected=True):
     lines=[{'text':''.join(s['text'] for s in l['spans']),'bbox':l['bbox'],'dir':tuple(l['dir'])} for b in page.get_text('dict')['blocks'] for l in b.get('lines',[])]
     spine=[l for l in lines if l['dir']!=(1.0,0.0)]
     assert bool(spine)==spine_expected,'spine suppression/placement mismatch'
+    for block in page.get_text('dict')['blocks']:
+        for line in block.get('lines',[]):
+            if tuple(line['dir'])!=(1.0,0.0):assert all(s['color']==0xffffff for s in line['spans']),'spine text is not visible white ink on black band'
     front=[];group='title'
     for line in lines:
         if line['bbox'][0]<=page.rect.width/2+25 or line['dir']!=(1.0,0.0):continue
