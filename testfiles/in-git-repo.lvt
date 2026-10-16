@@ -1,0 +1,9 @@
+% SPDX-License-Identifier: MIT
+\input{regression-test.tex}
+\documentclass[pages=100,barless]{kdpcover}
+\begin{document}
+\START
+\ifdefined\iexec\TYPE{Unexpected shell helper}\else\TYPE{No automatic shell helper}\fi
+\putVersion{1.0}
+\TYPE{Explicit version metadata}
+\END

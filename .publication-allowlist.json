@@ -1,0 +1,81 @@
+{
+  "description": "Exact reviewed source paths; hashes required for upstream binary assets and synthetic fixture bytes. Changes require manual review.",
+  "files": {
+    ".githooks/pre-commit": {},
+    ".githooks/pre-push": {},
+    ".github/workflows/actionlint.yml": {},
+    ".github/workflows/copyrights.yml": {},
+    ".github/workflows/l3build.yml": {},
+    ".github/workflows/markdown-lint.yml": {},
+    ".github/workflows/pdd.yml": {},
+    ".github/workflows/public-safety.yml": {},
+    ".github/workflows/reuse.yml": {},
+    ".github/workflows/typos.yml": {},
+    ".github/workflows/xcop.yml": {},
+    ".github/workflows/yamllint.yml": {},
+    ".gitignore": {},
+    ".publication-allowlist.json": {},
+    ".rultor.yml": {},
+    ".texsc": {},
+    "AGENTS.md": {},
+    "DEPENDS.txt": {},
+    "LICENSE.txt": {},
+    "LICENSES/MIT.txt": {},
+    "README.md": {},
+    "REUSE.toml": {},
+    "aspell.en.pws": {},
+    "build.lua": {},
+    "cactus.pdf": {
+      "sha256": "a7738452caa27318f52533db65acbedf9025b8d4ac372292504856e095e76af0",
+      "provenance": "preserved upstream public asset"
+    },
+    "docs/MAINTENANCE.md": {},
+    "docs/toolchain-baseline.json": {},
+    "kdpcover-signature.pdf": {
+      "sha256": "67605e99ae95de55705d7ac5559b65eae348451fef09aa8b7c18d69212b8d533",
+      "provenance": "preserved upstream public asset"
+    },
+    "kdpcover-vol-1.pdf": {
+      "sha256": "f4cb81f7c9a1c8a45ae215c4c4614746009c556528711480db92b1c4ba5100a6",
+      "provenance": "preserved upstream public asset"
+    },
+    "kdpcover-vol-2.pdf": {
+      "sha256": "a1ba68ddc656e37a92da36a12b850c6ccaca73f942177e315b0167d5e86b521e",
+      "provenance": "preserved upstream public asset"
+    },
+    "kdpcover-vol-3.pdf": {
+      "sha256": "49506db1c5a3b2b9295c08dd3cc905b77a37f71e69b1d2d586d1f120d824f244",
+      "provenance": "preserved upstream public asset"
+    },
+    "kdpcover-vol-4.pdf": {
+      "sha256": "6bb5b96bae68f862acf2a70afa3b93a362b7bd99d4dde7176376ad46e0328b44",
+      "provenance": "preserved upstream public asset"
+    },
+    "kdpcover.dtx": {},
+    "kdpcover.ins": {},
+    "renovate.json": {},
+    "scripts/cover_build.py": {},
+    "scripts/publication_preflight.py": {},
+    "testfiles/by-pdf.luatex.tlg": {},
+    "testfiles/by-pdf.lvt": {},
+    "testfiles/by-pdf.tlg": {},
+    "testfiles/by-pdf.xetex.tlg": {},
+    "testfiles/grid-size.lvt": {},
+    "testfiles/grid-size.tlg": {},
+    "testfiles/in-git-repo.lvt": {},
+    "testfiles/in-git-repo.tlg": {},
+    "testfiles/installed-pdfs.lvt": {},
+    "testfiles/installed-pdfs.tlg": {},
+    "testfiles/support/test.pdf": {
+      "sha256": "b2c3963fba7e6d651a9f8176b69532f1c8e28c8ad773ea70dc48e049046004f5",
+      "provenance": "preserved upstream public asset"
+    },
+    "tests/render_regression.py": {},
+    "tests/test_cover_build_guard.py": {},
+    "tests/test_publication_preflight.py": {},
+    "yb-book-logo.pdf": {
+      "sha256": "37889881c0e55809efd8e8e94550b36e27fba751e98ce7a6ca1dfffe393f30b9",
+      "provenance": "preserved upstream public asset"
+    }
+  }
+}
