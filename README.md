@@ -12,13 +12,12 @@ The problem this class solves is
 to change the size of the cover PDF according
 to the number of pages in the book — the bigger
 the book, the larger must be the cover. The provided class makes necessary
-calculations on-the-fly, using the [`qpdf`](https://qpdf.sourceforge.io/) tool.
-Obviously,
-you need to have it installed. Also, you must
-run `pdflatex` with the `--shell-escape` option,
-in order to allow LaTeX to run `qpdf`.
+calculations locally. In this maintained fork, `pdf=` uses engine primitives and
+`pages=` accepts an explicit count. Use `pdflatex -no-shell-escape`; qpdf is not required.
+Select `paper=cream` or `paper=white` and follow the external-private-storage build
+instructions in [MAINTENANCE](docs/MAINTENANCE.md).
 
-First,
+For the original upstream class,
 [install it](https://en.wikibooks.org/wiki/LaTeX/Installing_Extra_Packages)
 from [CTAN](https://ctan.org/pkg/kdpcover)
 and then use in the preamble:
@@ -42,3 +41,9 @@ then run `l3build check` in the root directory.
 It should compile everything without errors. If not, submit an issue and wait.
 Otherwise, make your changes and then run `l3build check` again. If the build is
 still clean, submit a pull request.
+
+## Maintained fork
+
+See [maintenance and private-content safeguards](docs/MAINTENANCE.md) and
+[agent orientation](AGENTS.md). Maintained changes and tested candidate pins are separate
+from the clean original-upstream tracking branch. No production manuscript belongs here.

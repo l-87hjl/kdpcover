@@ -2,9 +2,9 @@
 -- SPDX-License-Identifier: MIT
 
 module = "kdpcover"
-ctanupload = true
+ctanupload = false
 typesetopts = "-interaction=batchmode -shell-escape -halt-on-error"
-checkopts = "-interaction=batchmode -shell-escape -halt-on-error"
+checkopts = "-interaction=batchmode -no-shell-escape -halt-on-error"
 typesetfiles = {"kdpcover.dtx"}
 docfiles = {"yb-book-logo.pdf", "cactus.pdf"}
 sourcefiles = {"*.dtx", "*.ins", "kdpcover-signature.pdf", "kdpcover-vol-?.pdf"}

@@ -12,6 +12,7 @@ name: l3build
       - master
 jobs:
   l3build:
+    if: github.repository == 'yegor256/kdpcover'
     timeout-minutes: 15
     runs-on: ${{ matrix.os }}
     env:
